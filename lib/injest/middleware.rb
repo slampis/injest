@@ -2,7 +2,7 @@ class Injest::Middleware
   HEADERS_BLACKLIST = %w[HTTP_COOKIE].freeze
 
   attr_reader :configuration
-  attr_reader :request_type, :env, :consumer, :subject
+  attr_reader :request_type, :env, :subject
 
   def initialize(app, processor: nil)
     @app = app
@@ -10,7 +10,6 @@ class Injest::Middleware
 
     @processor = processor
 
-    @consumer = nil
     @subject = nil
   end
 
@@ -28,7 +27,6 @@ class Injest::Middleware
     @request_ended_on = Time.now
 
     set_subject
-    set_consumer
 
     data = build_data
     data = @processor.call(env, data) unless @processor.nil?
@@ -45,6 +43,7 @@ class Injest::Middleware
   private
 
   def append(data)
+    puts @configuration.inspect
     Injest::Writer.instance.append(data)
   end
 
@@ -66,6 +65,12 @@ class Injest::Middleware
   end
 
   def build_request
+    if env.key?('rack.session')
+      auth_scheme = env["rack.session"].fetch('auth_scheme', [])
+    else
+      auth_scheme = []
+    end
+    
     {
       method: env['REQUEST_METHOD'],
       server_name: env['SERVER_NAME'],
@@ -79,7 +84,7 @@ class Injest::Middleware
       headers: get_request_headers,
       subject: subject,
       context: get_context(env['action_dispatch.request.parameters'], env["action_dispatch.request.request_parameters"]),
-      auth_scheme: env["rack.session"].fetch('auth_scheme', [])
+      auth_scheme: auth_scheme
     }
   end
 
@@ -89,8 +94,7 @@ class Injest::Middleware
       controller: data['controller'],
       action: data['action'],
       params: params,
-      version: 'GEM',
-      consumer: consumer
+      version: Gem.loaded_specs["injest-client"].version.to_s,
     }
   end
 
@@ -129,14 +133,6 @@ class Injest::Middleware
     end
   end
 
-  def set_consumer
-    if !subject.blank?
-      @consumer = [subject[:type].downcase, subject[:id]].join(':')
-    elsif env["action_dispatch.request.parameters"].present?
-      @consumer = env["action_dispatch.request.parameters"].fetch('_consumer', 'unknown')
-    end
-  end
-
   def set_request_type
     # TODO: maybe we should check some header instead
     if env['PATH_INFO'].match?(/.*\.(?:png|css|jpeg|ico|gif)/)
@@ -153,8 +149,10 @@ class Injest::Middleware
   end
 
   def set_subject
+    return if env['rack.session'].nil?
+
     @subject = env["rack.session"].fetch('current_subject', {}).with_indifferent_access
-    if @subject.blank?
+    if @subject.nil?
       @subject = env["rack.session"].fetch(:current_subject, {}).with_indifferent_access
     end
   end

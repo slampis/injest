@@ -1,0 +1,44 @@
+PATH
+  remote: .
+  specs:
+    injest-client (0.1.6)
+      sidekiq
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    concurrent-ruby (1.2.2)
+    connection_pool (2.4.1)
+    diff-lcs (1.5.0)
+    rack (3.0.1)
+    redis-client (0.19.0)
+      connection_pool
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.0)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.0)
+    sidekiq (7.2.0)
+      concurrent-ruby (< 2)
+      connection_pool (>= 2.3.0)
+      rack (>= 2.2.4)
+      redis-client (>= 0.14.0)
+
+PLATFORMS
+  aarch64-linux
+
+DEPENDENCIES
+  injest-client!
+  rack
+  rspec
+
+BUNDLED WITH
+   2.3.26

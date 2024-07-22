@@ -5,6 +5,7 @@ class Injest::HttpClient
   attr_reader :root_url,
               :push_url,
               :search_url,
+              :raw_search_url,
               :jwt,
               :client_code
   def initialize(configuration)
@@ -16,6 +17,7 @@ class Injest::HttpClient
       @push_url = [root_url, 'api/v1/logs', client_code].join('/')
     end
     @search_url = [root_url, 'api/v1/logs/search'].join('/')
+    @raw_search_url = [root_url, 'api/v1/logs/raw_search'].join('/')
     @jwt = configuration.injest_token
   end
 
@@ -35,6 +37,13 @@ class Injest::HttpClient
     end
 
     post_http_request search_url, payload
+  end
+
+  def raw_search(body:, index_postfix: nil)
+    payload = { body: body }
+    payload[:index_postfix] = index_postfix unless index_postfix.nil?
+
+    post_http_request raw_search_url, payload
   end
 
   # Push a log
@@ -98,7 +107,7 @@ class Injest::HttpClient
     else
       data = JSON.parse(response.body) unless response.body.blank?
       puts "Endpoint replied with #{response.code} - #{data['error_code']}", data: data
-      raise "Endpoint replied with #{response.code} - #{data['error_code']}", data: data
+      raise "Endpoint replied with #{response.code} - #{data['error_code']}"
     end
   end
 
