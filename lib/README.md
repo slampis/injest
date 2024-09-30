@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### 0.1.8
+
+- Fix bug in the configuration initialization which prevented the INJEST_ROOT and INJEST_JWT from being set correctly
+
 ### 0.1.7
 
 - Support multiple strategies via the `INJEST_STRATEGY` env var, example: `INJEST_STRATEGY="stdout,http"`
@@ -39,8 +43,6 @@ ENV vars
 ```
 
 ## TODO:
-
-- **use json output wich ideally should not depend on sidekiq**
 
 - Customization with procs
 - Tests: https://guides.rubygems.org/make-your-own-gem/#writing-tests

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'injest-client'
-  s.version     = '0.1.7'
+  s.version     = '0.1.8'
   s.summary     = "Injest client"
   s.description = "Injest client"
   s.authors     = ["Stefano Lampis"]

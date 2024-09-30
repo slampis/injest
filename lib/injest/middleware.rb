@@ -43,7 +43,6 @@ class Injest::Middleware
   private
 
   def append(data)
-    puts @configuration.inspect
     Injest::Writer.instance.append(data)
   end
 
